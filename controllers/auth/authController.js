@@ -46,9 +46,9 @@ export const loginUser = async (req, res) => {
       res.status(404).json({ message: "User Not Found" });
     } else {
       const isMatchPassword = await bcrypt.compare(password, checkUser?.password);
-      if (isMatchPassword) {
+       if (isMatchPassword) {
         const token = jwt.sign(
-            { id: checkUser?._id, role: checkUser?.role, email: checkUser?.email },
+            { id: checkUser?._id, role: checkUser?.role, name: checkUser?.userName, email: checkUser?.email },
              process.env.JWT_SECRET,
             {
                 expiresIn: "24h",
@@ -65,8 +65,8 @@ export const loginUser = async (req, res) => {
         user: {
           id: checkUser._id,
           role: checkUser.role,
-          email: checkUser.email,
           name: checkUser.userName,
+          email: checkUser.email,
         },
       });
       } 
@@ -88,7 +88,7 @@ export const logoutUser = async (req, res) => {
 // auth Middleware (For retain the state after refreshing)
 
 export const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.jwt_token;
+  const token = req?.cookies?.jwt_token;
     if (!token) {
         console.log("token not found");
         return res.status(401).json({ message: "Unauthorized User!" });  // Add return here
@@ -96,6 +96,7 @@ export const authMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
+    console.log("decoded => ", decoded);
     next();
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized User!", error });
