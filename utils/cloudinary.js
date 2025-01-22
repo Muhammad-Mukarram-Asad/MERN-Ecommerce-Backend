@@ -18,4 +18,4 @@ export async function uploadToCloudinary(file) {
     return result;
 }
 
-export const upload = multer({ storage });
+export const upload = multer({ storage })
