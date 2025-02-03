@@ -7,6 +7,7 @@ const AddressSchema = new mongoose.Schema(
     pinCode: String,
     phone: String,
     notes: String,
+    street: stribg
   },
   { timestamps: true }
 );
