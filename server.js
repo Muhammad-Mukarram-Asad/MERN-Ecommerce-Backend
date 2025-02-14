@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
-app.use("/api/users", userRouter); // Added by myself for commiting
+app.use("/api/users", userRouter); 
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
