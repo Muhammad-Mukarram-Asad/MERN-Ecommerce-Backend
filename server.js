@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv'
 import authRouter from './routes/auth/authRoutes.js';
 import adminProductsRouter from './routes/admin/productsRoutes.js'
+import shopProductsRouter from './routes/shop/productRoutes.js'
 dotenv.config();
 
 const app = express();
@@ -19,7 +20,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
-app.use("/api/users", userRouter); // Added by myself for commiting
+app.use("/api/shop/products", shopProductsRouter);
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
