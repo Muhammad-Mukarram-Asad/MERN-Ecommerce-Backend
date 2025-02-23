@@ -121,29 +121,31 @@ export const fetchAllCartItems = async (req, res) => {
 export const updateCartItems = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
-    // Checking the data is valid or not
+
+    console.log("req.body => ", req.body);
     if (!userId || !productId || quantity <= 0) {
       return res.status(400).json({
-        status: false,
-        message: "Data is not valid. Either the user or product not exists.",
+        success: false,
+        message: "Invalid data provided!",
       });
     }
 
-    const cart = Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ userId });
     if (!cart) {
-      return res.status(400).json({
-        status: false,
-        message: "Cart not found",
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found!",
       });
     }
 
     const findCurrentProductIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
+
     if (findCurrentProductIndex === -1) {
-      return res.status(400).json({
-        status: false,
-        message: "The selected product cart not found.",
+      return res.status(404).json({
+        success: false,
+        message: "Cart item not present !",
       });
     }
 
@@ -155,7 +157,7 @@ export const updateCartItems = async (req, res) => {
       select: "image title price salePrice",
     });
 
-    const updatedPopulateCartItems = cart.items.map((item) => ({
+    const updatedPopulateCartItems = cart?.items?.map((item) => ({
       productId: item.productId ? item.productId._id : null,
       image: item.productId ? item.productId.image : null,
       title: item.productId ? item.productId.title : null,
@@ -181,60 +183,60 @@ export const updateCartItems = async (req, res) => {
   }
 };
 
-export const deleteCardItem = async (req, res) => {
+export const deleteCartItem = async (req, res) => {
   try {
-    const { userId, productId } = req.body;
-    // Checking the data is valid or not
+    const { userId, productId } = req.params;
     if (!userId || !productId) {
       return res.status(400).json({
-        status: false,
-        message: "Data is not valid. Either the user or product not exists.",
+        success: false,
+        message: "Invalid data provided!",
       });
     }
 
-    const cart = Cart.findOne({ userId: userId }).populate({
+    const cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
       select: "image title price salePrice",
     });
+
     if (!cart) {
-      res.status(400).json({
-        status: false,
-        message: "Cart not found",
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found!",
       });
     }
 
-    cart = cart.items.filter((item) => item.productId.toString() !== productId);
+    cart.items = cart.items.filter(
+      (item) => item.productId._id.toString() !== productId
+    );
 
     await cart.save();
+
     await cart.populate({
       path: "items.productId",
       select: "image title price salePrice",
     });
 
-    const updatedPopulateCartItems = cart.items.map((item) => ({
+    const populateCartItems = cart.items.map((item) => ({
       productId: item.productId ? item.productId._id : null,
       image: item.productId ? item.productId.image : null,
-      title: item.productId ? item.productId.title : null,
+      title: item.productId ? item.productId.title : "Product not found",
       price: item.productId ? item.productId.price : null,
       salePrice: item.productId ? item.productId.salePrice : null,
       quantity: item.quantity,
     }));
 
     res.status(200).json({
-      status: true,
+      success: true,
       data: {
         ...cart._doc,
-        items: updatedPopulateCartItems,
+        items: populateCartItems,
       },
-      message: "Cart deleted successfully",
     });
-  } catch (err) {
-    console.log("Error occurred in deleteCardItem: ", err);
+  } catch (error) {
+    console.log(error);
     res.status(400).json({
-      status: false,
-      message: `Error occurred in deleteCardItem: ${err}`,
+      success: false,
+      message: "Error",
     });
   }
 };
-
-module.exports = { addToCart, fetchAllCartItems, updateCartItems, deleteCardItem };
