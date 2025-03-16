@@ -7,6 +7,7 @@ import authRouter from './routes/auth/authRoutes.js';
 import adminProductsRouter from './routes/admin/productsRoutes.js'
 import shopProductsRouter from './routes/shop/productRoutes.js'
 import shopCartRouter from './routes/shop/cartRoutes.js'
+import commonFeatureRouter from './routes/common/featureRoute.js'
 dotenv.config();
 
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/shop/products", shopProductsRouter);
 app.use("/api/shop/carts", shopCartRouter);
+app.use("/api/common/feature", commonFeatureRouter);
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
